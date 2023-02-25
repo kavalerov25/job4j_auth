@@ -15,6 +15,7 @@ public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @EqualsAndHashCode.Include
     private String login;
     private String password;
 }
