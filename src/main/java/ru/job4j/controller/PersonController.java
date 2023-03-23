@@ -25,12 +25,6 @@ public class PersonController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PersonController.class.getSimpleName());
     private final PersonService persons;
 
-    public PersonController(PersonService persons, BCryptPasswordEncoder encoder, ObjectMapper objectMapper) {
-        this.persons = persons;
-        this.encoder = encoder;
-        this.objectMapper = objectMapper;
-    }
-
     private final BCryptPasswordEncoder encoder;
     private final ObjectMapper objectMapper;
 
@@ -46,7 +40,6 @@ public class PersonController {
                         HttpStatus.NOT_FOUND, "Person is not found. Please, check login"
                 ));
     }
-
 
     @PostMapping("/")
     public ResponseEntity<Person> create(@RequestBody Person person) {
