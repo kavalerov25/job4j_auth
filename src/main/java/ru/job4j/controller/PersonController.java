@@ -7,13 +7,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.job4j.domain.Person;
+import ru.job4j.domain.PersonCredentials;
 import ru.job4j.service.PersonService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -45,28 +48,35 @@ public class PersonController {
         );
     }
 
+    @Validated
     @PostMapping("/")
-    public ResponseEntity<Person> create(@RequestBody Person person) {
+    public ResponseEntity<Person> create(@Valid @RequestBody PersonCredentials personDTO) {
 
-        if (person.getLogin().equals(person.getPassword())) {
+        if (personDTO.getLogin().equals(personDTO.getPassword())) {
             throw new IllegalArgumentException("Login and password must be not equal!");
         }
+
+        Person person = new Person();
+        person.setLogin(personDTO.getLogin());
+        person.setPassword(personDTO.getPassword());
+
         return new ResponseEntity<>(
                 this.persons.create(person),
                 HttpStatus.CREATED
         );
     }
 
+    @Validated
     @PutMapping("/")
-    public Person updatePassword(@RequestBody Person person) {
+    public ResponseEntity<Void> updatePassword(@Valid @RequestBody Person person) {
         var personOpt = persons.findByLogin(person.getLogin());
         if (personOpt.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No person found for update. Check login.");
         }
-        if (!persons.update(person)) {
+        if (!persons.update(personOpt.get())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No person found for update! Check id.");
         }
-        return person;
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
