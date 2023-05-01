@@ -1,4 +1,4 @@
-create table person
+create table if not exists person
 (
     id       serial primary key not null,
     login    varchar(2000) unique not null ,

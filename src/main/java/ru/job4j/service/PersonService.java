@@ -26,7 +26,12 @@ public class PersonService implements UserDetailsService {
     }
 
     public Optional<Person> findById(int id) {
+
         return personRepository.findById(id);
+    }
+
+    public Optional<Person> findByLogin(String login) {
+        return personRepository.findPersonByLogin(login);
     }
 
     public Person create(Person person) {
@@ -53,10 +58,10 @@ public class PersonService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Person person = personRepository.findPersonByLogin(username);
-        if (person == null) {
+        Optional<Person> person = personRepository.findPersonByLogin(username);
+        if (person.isEmpty()) {
             throw new UsernameNotFoundException(username);
         }
-        return new User(person.getLogin(), person.getPassword(), emptyList());
+        return new User(person.get().getLogin(), person.get().getPassword(), emptyList());
     }
 }
